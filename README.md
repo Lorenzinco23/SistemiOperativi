@@ -1,2 +1,9 @@
-# SistemiOperativi
-Progetto corso sistemi operativi, malloc
+# SistemiOperativi - Malloc
+
+Usage:
+TODO
+
+Directories:
+TODO
+
+
