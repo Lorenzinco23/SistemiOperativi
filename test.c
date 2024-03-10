@@ -1,8 +1,9 @@
 #include "headers/my_malloc.h"
+#include "headers/utils.h"
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
-#define MEGABYTE 1024*1024
 
 typedef struct{
   int a;
@@ -22,8 +23,11 @@ int main() {
   my_struct->c = 44;
   printf("%d %d %d\n", my_struct->a, my_struct->b, my_struct->c);
 
+  assert((void *)ptr != (void *)my_struct);
+
   my_free(ptr);
   my_free(my_struct);
+
 
   //mmap allocator tests
   void *ptr2 = my_malloc(MEGABYTE * 2);

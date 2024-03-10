@@ -12,3 +12,4 @@ typedef struct mmap_block {
 void * mmap_allocate(size_t size);
 int mmap_deallocate(void * ptr);
 size_t mmap_allocated_size(void * ptr);
+void mmap_init();

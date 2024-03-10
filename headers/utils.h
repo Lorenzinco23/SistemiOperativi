@@ -14,3 +14,6 @@ void bitmap_init(); ///initializes the bitmap
 void size_init();
 int size_set(size_t index, size_t len);
 size_t size_unset(uint32_t index);
+
+void debug_print_sizes();
+void debug_print_bitmap();

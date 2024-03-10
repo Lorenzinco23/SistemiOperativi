@@ -23,6 +23,6 @@ void my_free(void * ptr){
 
 void my_malloc_init(){
     buddy_init();
-    
+    mmap_init();
     initialized = true;
 }

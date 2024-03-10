@@ -1,6 +1,7 @@
 #include "../headers/buddy_allocator.h"
 #include "../headers/utils.h"
 #include "../headers/mmap_allocator.h"
+#include <stdio.h>
 
 uint8_t heap[MEGABYTE];
 

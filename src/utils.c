@@ -1,5 +1,6 @@
 #include "../headers/utils.h"
 #include <string.h>
+#include <stdio.h>
 
 uint8_t bitmap[MEGABYTE/8];
 uint8_t size[MEGABYTE/8];
@@ -66,18 +67,21 @@ void bitmap_allocate(size_t index, size_t size){
     for(size_t i = 0; i < size; i++){
         bitmap_set(index+i);
     }
+    size_set(index,size);
 }
 
 void bitmap_deallocate(size_t index, size_t size){
     ///sets the index to free
     for(size_t i = 0; i < size; i++){
         bitmap_set(index+i);
+        
     }
+    size_unset(index);
 }
 
 size_t size_unset(uint32_t index){
     ///finds the size of the memory block cycling through the size bitmap bit by bit until it finds a 1
-    size_t len = 0;
+    size_t len = 1;
     uint8_t mask = 1<<7;
     mask = mask >> (index%8);
     size[index/8] ^= mask;
@@ -93,4 +97,26 @@ size_t size_unset(uint32_t index){
         }
     }
     return 0;
+}
+
+void debug_print_sizes(){
+    ///prints the size bitmap
+    for(uint32_t i = 0; i < MEGABYTE/8; i++){
+        for(uint8_t j = 0; j < 8; j++){
+            if(size[i] & 1<<j)
+                printf("s[%d]%d\n",i,size[i] & 1<<j);
+        }
+    }
+    printf("\n");
+}
+
+void debug_print_bitmap(){
+    ///prints the bitmap
+    for(uint32_t i = 0; i < MEGABYTE/8; i++){
+        for(uint8_t j = 0; j < 8; j++){
+            if(bitmap[i] & 1<<j)
+                printf("b[%d]%d\n",i,bitmap[i] & 1<<j);
+        }
+    }
+    printf("\n");
 }

@@ -2,6 +2,13 @@
 
 mmap_block mmap_allocations[MAX_MMAP_ALLOCATIONS];
 
+void mmap_init(){
+    for (uint32_t i = 0; i < MAX_MMAP_ALLOCATIONS; i++){
+        mmap_allocations[i].addr = NULL;
+        mmap_allocations[i].size = 0;
+    }
+}
+
 size_t mmap_get_size(void * ptr){
     for (uint32_t i = 0; i < MAX_MMAP_ALLOCATIONS; i++){
         if (mmap_allocations[i].addr == ptr){
