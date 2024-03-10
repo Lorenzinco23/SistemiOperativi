@@ -1,4 +1,5 @@
 #include "../headers/my_malloc.h"
+#include "../headers/utils.h"
 
 uint8_t heap[MEGABYTE];
 
