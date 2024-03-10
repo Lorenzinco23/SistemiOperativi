@@ -7,28 +7,28 @@ INCDIR = headers
 BUILDDIR = build
 
 # Files
-SOURCES := $(wildcard $(SRCDIR)/*.c)
-OBJECTS := $(SOURCES:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
+SOURCES := $(wildcard $(SRCDIR)/*.c) test.c
+OBJECTS := $(patsubst %.c,$(BUILDDIR)/%.o,$(SOURCES))
 EXECUTABLE = malloc
 
 # Compiler flags
 CFLAGS = -I$(INCDIR) -O3
 
 # Default rule
-all: $(EXECUTABLE)
+all: $(BUILDDIR) $(EXECUTABLE)
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)/$(SRCDIR)
+
+# Compilation
+$(BUILDDIR)/%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Linking
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@
+	$(CC) $^ -o $@
 
-# Compilation
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c
-	@mkdir -p $(BUILDDIR)
-	$(CC) -c $< -o $@ $(CFLAGS)
-
-# Clean rule
+# Cleaning
+.PHONY: clean
 clean:
 	rm -rf $(BUILDDIR) $(EXECUTABLE)
-
-# Phony targets
-.PHONY: all clean

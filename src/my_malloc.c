@@ -1,17 +1,28 @@
+#include "../headers/buddy_allocator.h"
 #include "../headers/my_malloc.h"
+#include "../headers/mmap_allocator.h"
 #include "../headers/utils.h"
+#include <stdbool.h>
 
-uint8_t heap[MEGABYTE];
+extern uint8_t heap[MEGABYTE];
+bool initialized = false;
 
-void buddy_init(){
-    block_t * buddy_heap = (block_t *)heap;
-    buddy_heap->size = MEGABYTE-sizeof(block_t);
-    buddy_heap->prev_size = 0;
-    buddy_heap->next = NULL;
-    buddy_heap->prev = NULL;
+
+
+void * my_malloc(size_t size){
+    if (!initialized) my_malloc_init();
+    if(size > MEGABYTE) return mmap_allocate(size);
+    return buddy_find(size);
 }
 
-block_t* buddy_find(size_t size){
-    block_t * buddy_heap = (block_t *)heap;
-    while(buddy_heap->next)
+void my_free(void * ptr){
+    if (!initialized) return;
+    if ((uint8_t *)ptr < heap || (uint8_t *)ptr > heap + MEGABYTE) mmap_deallocate(ptr);
+    else buddy_deallocate(ptr);
+}
+
+void my_malloc_init(){
+    buddy_init();
+    
+    initialized = true;
 }
