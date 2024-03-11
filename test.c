@@ -39,4 +39,5 @@ int main() {
   void *ptr3 = my_malloc(MEGABYTE-1);
   printf("%p\n", ptr3);
   assert(ptr3 == ptr);
+  my_free(ptr3);
 }
