@@ -29,16 +29,16 @@ int bitmap_set(size_t index){
 
 int size_set(size_t index, size_t len){
     ///set to 1 the bits at the start of the memory block and at the end
-    if(index > MEGABYTE/8){
+    if(index > MEGABYTE/8 || len < 1){
         return -1;
     }
-
     uint8_t mask = 1<<7;
     mask = mask >> (index%8);
     size[index/8] ^= mask;
+    
     mask = 1<<7;
-    mask = mask >> ((index+len)%8);
-    size[(index+len)/8] ^= mask;
+    mask = mask >> ((index+len-1)%8);
+    size[(index+len-1)/8] ^= mask;
     return size[index/8] & mask;
 }
 
@@ -74,24 +74,38 @@ void bitmap_deallocate(size_t index, size_t size){
     ///sets the index to free
     for(size_t i = 0; i < size; i++){
         bitmap_set(index+i);
-        
     }
-    size_unset(index);
+}
+
+void print_debug_unset(uint32_t index, size_t len){
+    printf("Size set deallocated %d %d\n",index,len);
+    for (int i = 0; i < MEGABYTE/8; i++){
+        for (int j = 0; j < 8; j++){
+            if(size[i] & 128>>j)
+                printf("After deallocation: Size[%d]%u\n",i*8+j,size[i]>>(7-j)&1);
+        }
+    }
 }
 
 size_t size_unset(uint32_t index){
     ///finds the size of the memory block cycling through the size bitmap bit by bit until it finds a 1
     size_t len = 1;
     uint8_t mask = 1<<7;
+
+    if(!(size[index/8] & mask>>(index%8))) return 0;
+
     mask = mask >> (index%8);
     size[index/8] ^= mask;
     
-    for(uint32_t i = index; i < MEGABYTE/8; i++){
-        for(uint8_t j = 0; j < 8; j++){
-            if((size[i] & 1<<j) == 0)len++;
+    for(uint32_t i = index/8; i < MEGABYTE/8; i++){
+        uint8_t starting_j = i == index/8 ? index%8 : 0;
+        for(uint8_t j = starting_j; j < 8; j++){
+            if((size[i] & (128>>j)) == 0){len++;}
             else{
                 //bitflip the bit and return the length
-                size[i] ^= 1<<j;
+                mask = 1<<7;
+                mask = mask >> ((index+len-1)%8);
+                size[(index+len-1)/8] ^= mask;
                 return len;
             }
         }
@@ -99,12 +113,14 @@ size_t size_unset(uint32_t index){
     return 0;
 }
 
+
+
 void debug_print_sizes(){
     ///prints the size bitmap
     for(uint32_t i = 0; i < MEGABYTE/8; i++){
         for(uint8_t j = 0; j < 8; j++){
             if(size[i] & 1<<j)
-                printf("s[%d]%d\n",i,size[i] & 1<<j);
+                printf("s[%d]%u\n",i,size[i]>>j & 1);
         }
     }
     printf("\n");
@@ -115,7 +131,7 @@ void debug_print_bitmap(){
     for(uint32_t i = 0; i < MEGABYTE/8; i++){
         for(uint8_t j = 0; j < 8; j++){
             if(bitmap[i] & 1<<j)
-                printf("b[%d]%d\n",i,bitmap[i] & 1<<j);
+                printf("b[%d]%u\n",i,bitmap[i]>>j & 1);
         }
     }
     printf("\n");
